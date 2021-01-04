@@ -12,6 +12,7 @@ if (isset($_POST['submit'])) {
 }
 
 
+
 ?>
 
 <!DOCTYPE html>
@@ -22,6 +23,16 @@ if (isset($_POST['submit'])) {
   <title>Document</title>
 </head>
 <body>
+
+
+<p>
+What time will you be picking up?
+<select name="formGender">
+  <option value="">Select...</option>
+  <option value="M">Male</option>
+  <option value="F">Female</option>
+</select>
+</p>
 
 <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method='POST'>
   <input type="text" name="name">

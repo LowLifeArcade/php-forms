@@ -28,6 +28,9 @@
       margin: 20px auto;
       padding: 20px;
     }
+    ul.dropdown-content.select-dropdown li span {
+    color: grey; /* no need for !important :) */
+}
 </style>
 </head>
 <body class="grey lighten-4">

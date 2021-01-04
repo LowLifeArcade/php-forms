@@ -82,7 +82,7 @@
       <label for="">Your Email</label>
       <input type="text" name="email" value="<?php echo htmlspecialchars($email) ?>" >
       <div class="red-text"><?php echo $errors['email'] ?></div>
-      <label for="">Name</label>
+      <label for="">Family Name</label>
       <input type="text" name="name" value="<?php echo htmlspecialchars($name) ?>">
       <div class="red-text"><?php echo $errors['name'] ?></div>
       <label for="">Special Requests (separated by comma:)</label>
@@ -90,6 +90,9 @@
       <div class="red-text"><?php echo $errors['special'] ?></div>
       <div class="center">
         <input type="submit" name="submit" value="submit" class="btn brand z-depth-0">
+        <?php session_start();
+
+          $_SESSION['name'] = $_POST['name']; ?>  
       </div>
       </form>
     </section>

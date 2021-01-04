@@ -7,7 +7,7 @@
     session_unset();
   }
 
-  $name = $_SESSION['name'];
+  $sessionName = $_SESSION['name'] ?? 'Guest';
 
 ?>
 <head>
@@ -35,7 +35,7 @@
     <div class="container">
       <a href="index.php" class="left brand-logo brand-text">Oak Park Meals</a>
       <ul id="nav-mobile" class="right hide-on-small-and-down">
-        <li class="grey-text"><?php echo htmlspecialchars($name); ?></li>
+        <li class="grey-text">Hello, <?php echo htmlspecialchars($sessionName); ?></li>
         <li><a href="add.php" class="btn brand z-depth-0">Weekly Request</a></li>
         <!-- <li><a href="#" class="btn brand z-depth-0">Add Pizza</a></li>
         <li><a href="#" class="btn brand z-depth-0">Add Pizza</a></li> -->

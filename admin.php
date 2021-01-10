@@ -3,7 +3,7 @@
 include 'config/db_connect.php';
 
 // query for all people's meals
-$sql = 'SELECT orderId, mealVar, mealAmount FROM meals ORDER BY createdAt';
+$sql = 'SELECT userId, userName, userEmail FROM meals ORDER BY pickUpTime';
 
 // make query get result
 $result = mysqli_query($conn, $sql);
@@ -26,9 +26,8 @@ mysqli_close($conn);
 
 <?php include 'templates/header.php'; ?>
 
-<h4 class="center grey-text">Order Now</h4>
-
-<!-- <div class="container">
+<h4 class="center grey-text">meal requests</h4>
+<div class="container">
   <div class="row">
 
     <?php foreach ($meals as $meal) : ?>
@@ -52,12 +51,12 @@ mysqli_close($conn);
 
     <?php endforeach; ?>
 
-     <?php if (count($meals) >= 2) : ?>
+    <!-- <?php if (count($meals) >= 2) : ?>
       oh hai
-    <?php endif ?>
+    <?php endif ?> -->
 
   </div>
-</div> -->
+</div>
 
 <?php include 'templates/footer.php'; ?>
 

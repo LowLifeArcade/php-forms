@@ -36,10 +36,10 @@
 <body class="grey lighten-4">
   <nav class="white z-depth-0">
     <div class="container">
-      <a href="request.php" class="left brand-logo brand-text">Oak Park Meals</a>
+      <label class="left brand-logo brand-text">Oak Park Meals</label>
       <ul id="nav-mobile" class="right hide-on-small-and-down">
-        <li class="grey-text">Hello, <?php echo htmlspecialchars($sessionName); ?></li>
-        <li><a href="request.php" class="btn brand z-depth-0">My Requests</a></li>
+        <li class="grey-text"></li>
+        <!-- <li><a href="request.php" class="btn brand z-depth-0">Weekly Request</a></li> -->
         <!-- <li><a href="#" class="btn brand z-depth-0">Add Pizza</a></li>
         <li><a href="#" class="btn brand z-depth-0">Add Pizza</a></li> -->
       </ul>

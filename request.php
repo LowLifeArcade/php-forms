@@ -1,12 +1,8 @@
 <?php
 include('config/db_connect.php');
 
-// open orders
-
-// setup user for sql query first somehow so that the query only returns the users meals not everyones
-
-// query for all meals
-$sql = 'SELECT mealAmount, mealVar, gf, pickupTime, pickupWeek FROM meals ORDER BY createdAt';
+// query for all meals to show as receipts at top of page
+$sql = 'SELECT orderId, mealAmount, mealVar, gf, pickupTime, pickupWeek FROM meals ORDER BY createdAt';
 
 // make query get result
 $result = mysqli_query($conn, $sql);
@@ -17,48 +13,26 @@ $meals = mysqli_fetch_all($result, MYSQLI_ASSOC);
 // // free memory up
 mysqli_free_result($result);
 
-// // close connection
-mysqli_close($conn);
 
-// // explode(',', $meals[1]['special']);
-
-// /open orders
-
-// needs to be a get or post value from signup or users table. Probably a mysqli. 
+// HARD coded need to change from users table numberOfStudents amount allowed 
 $allowedMeals = 5;
 
 // initializing
-$mealVar = $glurenFree = $mealRequest = $pickupTime = $pickupDate = $mealType;
+$mealVar = $glurenFree = $mealRequest = $pickupTime = $pickupWeek = $mealType;
 $errors = array('meal-request' => '', 'gluten-free' => '', 'meal-request' => '', 'desired-meals' => '', 'pickup-time' => '', 'pickup-week' => '');
 
 // Filters and then post
 if (isset($_POST['submit'])) {
 
-  // if (empty($_POST['pickuptime'])) {
-  //   $errors['pickuptime'] = 'Pick up time is required <br />';
-  // } else {
-  //   $email = $_POST['pickuptime'];
-  //   if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-  //     $errors['pickuptime'] = 'pick up time must be valid';
-  //   }
-  // }
-  // if (empty($_POST['email'])) {
-  //   $errors['email'] = 'email is required <br />';
-  // } else {
-  //   $email = $_POST['email'];
-  //   if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-  //     $errors['email'] = 'email must be valid';
-  //   }
-  // }
 
-  // if (empty($_POST['childname'])) {
-  //   $errors['childname'] =  'family name is required <br />';
-  // } else {
-  //   $childname = $_POST['childname'];
-  //   if (!preg_match('/^[a-zA-Z\s]+$/', $childname)) {
-  //     $errors['childname'] = 'family name must be letters and space only  ';
-  //   }
-  // }
+  if (empty($_POST['pickup-time'])) {
+    $errors['pickup-time'] =  'choose pickup time';
+  } else {
+    $pickupTime = $_POST['pickup-time'];
+    if (!preg_match('/^[a-zA-Z\s]+$/', $pickupTime)) {
+      $errors['pickup-time'] = 'pickup time must be letters and space only  ';
+    }
+  }
 
   //  potentially use the else if for note field where parent can put special notes
   if (empty($_POST['meal-request'])) {
@@ -81,26 +55,36 @@ if (isset($_POST['submit'])) {
 
   // check for errors
   if (array_filter($errors)) {
-    // echo "errors in form";
-    // echo "error";
-    // $block = 'display:block';
-    ?>
-    <script>document.querySelectorAll(".order1").css({
-          display: "block"
-        });</script>
-    <?php 
+    echo $errors['meal-request'];
   } else {
 
-    // // save data to database
-    // $mealRequest = mysqli_real_escape_string($conn, $_POST['meal-request']);
+    // db linkId == userId
+    // save data to database
+    $mealRequest = mysqli_real_escape_string($conn, $_POST['meal-request']);
     // $GF = mysqli_real_escape_string($conn, $_POST['gluten-free']);
-    // $mealType = mysqli_real_escape_string($conn, $_POST['desired-meals']);
-    // $pickupTime = mysqli_real_escape_string($conn, $_POST['pickup-time']);
-    // $pickupDate = mysqli_real_escape_string($conn, $_POST['pickup-week']);
-    
+    $mealType = mysqli_real_escape_string($conn, $_POST['desired-meals']);
+    $pickupTime = mysqli_real_escape_string($conn, $_POST['pickup-time']);
+    $pickupWeek = mysqli_real_escape_string($conn, $_POST['pickup-week']);
+    $linkId = mysqli_real_escape_string($conn, $_POST['userId']);
+    if(isset($_POST['gluten-free'])){
+      $GF = 'yes';
+    } else {
+      $GF = 'no';
+    }
 
-    // // create sql
-    // $sql = "INSERT INTO meals(mealVar,gf,mealType,pickupTime,pickupWeek) VALUES('$mealRequest', '$GF', $mealType '$pickuTime','$pickupDate')";
+    // // // save data to database
+    // $mealRequest = $_POST['meal-request'];
+    // // $GF = $_POST['gluten-free'];
+    // $mealType = $_POST['desired-meals'];
+    // $pickupTime = $_POST['pickup-time'];
+    // $pickupWeek = $_POST['pickup-week'];
+    // $linkId = $_POST['userId'];
+
+
+
+
+    // create sql
+    $sql = "INSERT INTO meals (mealVar,gf,mealType,pickupTime,pickupWeek,linkId) VALUES ('$mealRequest', '$GF', '$mealType', '$pickupTime', '$pickupWeek', '$linkId')";
     // // save to db
     // if (mysqli_query($conn, $sql)) {
 
@@ -108,7 +92,24 @@ if (isset($_POST['submit'])) {
     // } else {
     //   echo 'query error: ' . mysqli_error($conn);
     // }
+
+    // // create sql
+    // $sql = "INSERT INTO meals (mealVar, linkId) VALUES ('$mealRequest', '$linkId')";
+    // save to db
+    if (mysqli_query($conn, $sql)) {
+      // this looks for last id made in meals table
+      $orderId = $conn->insert_id;
+
+      header('Location: thankyou.php?id=' . $orderId);
+      // header('Location: thankyou.php');
+    } else {
+      echo 'query error: ' . mysqli_error($conn);
+    }
   }
+
+
+// close connection
+mysqli_close($conn);
 }
 
 ?>
@@ -125,16 +126,19 @@ if (isset($_POST['submit'])) {
 
     <?php foreach ($meals as $meal) : ?>
 
-      <div class="col s6 md3">
-        <div class="card z-depth-0">
+      <div class="col s6 md3 grey-text">
+        <div class="card z-depth-2">
           <div class="card-content center">
-            <label for="">Your Order for</label>
+            <label for="">Your Request for</label>
             <h6><?php echo htmlspecialchars($meal['pickupWeek']); ?></h6>
             <ul>
-              <?php foreach (explode(',', $meal['pickupTime']) as $special) : ?>
-                <li><?php echo htmlspecialchars($special) ?></li>
+            <label for="">Pickup between</label>
+
+              <?php foreach (explode(',', $meal['pickupTime']) as $details) : ?>
+                <li><?php echo htmlspecialchars($details) ?></li>
               <?php endforeach ?>
-              <li><?php echo htmlspecialchars($meal['mealAmount']) ?> meals</li>
+              
+              <!-- <li><?php //echo htmlspecialchars($meal['mealAmount']) ?> </li> -->
             </ul>
           </div>
           <div class="card-action right-align">
@@ -158,6 +162,7 @@ if (isset($_POST['submit'])) {
 <section class="container grey-text">
 
   <form action="request.php" class="" method="POST">
+  <input name="userId" value="1" type="hidden">
     <button class="allowed" id="allowed" style="display:none" value="<?php echo $allowedMeals ?>">
     </button>
 
@@ -165,54 +170,42 @@ if (isset($_POST['submit'])) {
 
       <!-- <label for="">Child's Name</label>
       <input type="text" name="childName">
-      <div class="red-text"><?php //echo $errors['childName'] ?></div> -->
+      <div class="red-text"><?php //echo $errors['childName'] 
+                            ?></div> -->
 
       <label for="">Meal Request #1</label>
       <div class="input-field col s12">
         <select name="meal-request">
           <option value="" disabled selected>Select Meal Type...</option>
-          <option value="1">Standard</option>
-          <option value="2">Vegetarian</option>
-          <option value="3">Vegan (lunch only)</option>
+          <option value="ST">Standard</option>
+          <option value="VT">Vegetarian</option>
+          <option value="VG">Vegan (lunch only)</option>
         </select>
-      <div class="red-text"><?php echo $errors['meal-request'] ?>
-      </div>
+        <div class="red-text"><?php echo $errors['meal-request'] ?>
         </div>
-
+      </div>
       <div class="">
         <label>
-          <input type="checkbox" name="gluten-free" class="with-gap" <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> value="Gluten Free">
+          <input type="checkbox" name="gluten-free" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="gf">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
-      <!-- Meals desired  -->
-      <!-- <p>
-        <label for="">Select which meals are desired?</label>
-      <div type="text" class="input-field grey-text col s12">
-          <select name="desired-meals">
-            <option value="" disabled><label></label> </option>
-            <option value="1" selected><label>Breakfast and Lunch</label> </option>
-            <option value="2">Breakfast only</option>
-            <option value="3">Lunch only</option>
-          </select>
-        </p>
-      </div> -->
       <br>
     </div>
 
-    <!-- <div id="2" class="order2" style="display:none">
+    <div id="2" class="order2" style="display:none">
       <label for="">Meal Request #2</label>
       <div class="input-field col s12">
         <select name="meal-request">
           <option value="" disabled selected>Select Meal Type...</option>
-          <option value="1">Standard</option>
-          <option value="2">Vegetarian</option>
-          <option value="3">Vegan (lunch only)</option>
+          <option value="ST">Standard</option>
+          <option value="VT">Vegetarian</option>
+          <option value="VG">Vegan (lunch only)</option>
         </select>
       </div>
       <div class="">
         <label>
-          <input type="checkbox" name="prefrence" class="with-gap" <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> value="Gluten Free">
+          <input type="checkbox" name="gluten-free" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="gf">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
@@ -231,14 +224,14 @@ if (isset($_POST['submit'])) {
       </div>
       <div class="">
         <label>
-          <input type="checkbox" name="prefrence" class="with-gap" <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> value="Gluten Free">
+          <input type="checkbox" name="prefrence" class="with-gap" <?php //if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> value="Gluten Free">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
       <br>
     </div>
 
-    <div id="4" class="order4" style="display:none">
+    <!-- <div id="4" class="order4" style="display:none">
       <label for="">Meal Request #4</label>
       <div class="input-field col s12">
         <select name="meal-request">
@@ -250,7 +243,7 @@ if (isset($_POST['submit'])) {
       </div>
       <div class="">
         <label>
-          <input type="checkbox" name="prefrence" class="with-gap" <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> value="Gluten Free">
+          <input type="checkbox" name="prefrence" class="with-gap" <?php //if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> value="Gluten Free">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
@@ -269,7 +262,7 @@ if (isset($_POST['submit'])) {
       </div>
       <div class="">
         <label>
-          <input type="checkbox" name="prefrence" class="with-gap" <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> value="Gluten Free">
+          <input type="checkbox" name="prefrence" class="with-gap" <?php //if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> value="Gluten Free">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
@@ -297,9 +290,9 @@ if (isset($_POST['submit'])) {
         <p>
           Select which meals are desired? <br>(Vegan and Gluten Free options will be lunch only)
           <select name="desired-meals">
-            <option value="1"><label>Breakfast and Lunch</label> </option>
-            <option value="2">Breakfast only</option>
-            <option value="3">Lunch only</option>
+            <option value="BL"><label>Breakfast and Lunch</label> </option>
+            <option value="BO">Breakfast only</option>
+            <option value="LO">Lunch only</option>
           </select>
         </p>
       </div>
@@ -311,12 +304,13 @@ if (isset($_POST['submit'])) {
           What time will you be picking up? <br>(Pick up is on Monday. Tuesday if a holiday falls on that monday.)
           <select name="pickup-time">
             <option value="" class="grey-text" disabled selected></option>
-            <option value="1">7-9am</option>
-            <option value="2">10-1pm</option>
-            <option value="3">2-4pm</option>
+            <option value="7 to 9am">7am to 9am</option>
+            <option value="11 to 1pm">11pm to 1pm</option>
+            <option value="4 to 6pm">4pm to 6pm</option>
           </select>
         </p>
-      </div>
+      </div><?php echo $errors['pickup-time'] ?>
+          
       <br>
 
       <!-- Week of -->
@@ -324,7 +318,7 @@ if (isset($_POST['submit'])) {
       </br></br>
 
       <!-- add reset button on otherside of add meal that turns everything back to display:none and empties the fields. Maybe just a refresh or something -->
-      
+
       <!-- Submit -->
       <div class="right">
         <input type="submit" name="submit" value="submit" class="btn brand z-depth-0">
@@ -356,7 +350,7 @@ if (isset($_POST['submit'])) {
       minDate: date,
       autoClose: true,
       disableDayFn: function(date) {
-        if (date.getDay() == 1) 
+        if (date.getDay() == 1)
           return false;
         else
           return true;
@@ -377,7 +371,7 @@ if (isset($_POST['submit'])) {
     //   $("#1").clone().appendTo("#1");
 
     // });
-    
+
 
     $("#add").on('click', function(e) {
       if (order < allowedMeals) {

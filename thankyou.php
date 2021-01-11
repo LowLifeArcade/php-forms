@@ -50,12 +50,11 @@ if (isset($_GET['id'])) {
   <?php include('templates/header.php'); ?>
 
   <h4 class="center grey-text">Thank you!</h4>
-
+  <h5 class="center grey-text">your confirmation number is: <br>(Not yet made) </h5>
 
   <div class="container center">
     <?php if ($meal) : ?>
       <div class="" >
-        <h4><?php echo htmlspecialchars($meal['mealAmount']); ?> meals</h4>
         <p><?php // echo htmlspecialchars($meal['mealTypes']); 
             ?></p>
         <p>pick up time <br><?php echo htmlspecialchars($meal['pickupTime']) ?><br>
@@ -71,7 +70,7 @@ if (isset($_GET['id'])) {
 
       <form action="details.php" method="POST">
         <input type="hidden" name="id_to_cancel" value="<?php echo $meal['userId'] ?>">
-        <input type="submit" name="cancel" value="Cancel Order" class="btn brand z-depth-0.1">
+        <input type="submit" name="cancel" value="Cancel Order" class="btn brand z-depth-0">
       </form>
 
       <!-- put edit form here-->

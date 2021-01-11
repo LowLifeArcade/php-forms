@@ -18,82 +18,159 @@ mysqli_free_result($result);
 $allowedMeals = 5;
 
 // initializing
-$mealVar = $glurenFree = $mealRequest = $pickupTime = $pickupWeek = $mealType;
-$errors = array('meal-request' => '', 'gluten-free' => '', 'meal-request' => '', 'desired-meals' => '', 'pickup-time' => '', 'pickup-week' => '');
+$mealAmount = $mealVar = $glurenFree = $mealRequest = $glurenFree2 = $mealRequest2 = $glurenFree3 = $mealRequest3 = $glurenFree4 = $mealRequest4 = $glurenFree5 = $mealRequest5 = $pickupTime = $pickupWeek = $mealType;
+$errors = array('meal-request' => '', 'meal-request2' => '', 'meal-request3' => '', 'meal-request4' => '', 'meal-request5' => '', 'gluten-free' => '', 'gluten-free2' => '', 'gluten-free3' => '', 'gluten-free4' => '', 'gluten-free5' => '', 'meal-request' => '', 'desired-meals' => '', 'pickup-time' => '', 'pickup-week' => '');
 
-// Filters and then post
+// Filters
 if (isset($_POST['submit'])) {
 
-
-  if (empty($_POST['pickup-time'])) {
-    $errors['pickup-time'] =  'choose pickup time';
+  if (empty($_POST['meal-request'])) {
+    $errors['meal-request'] = "choose meal type, ";
   } else {
-    $pickupTime = $_POST['pickup-time'];
-    if (!preg_match('/^[a-zA-Z\s]+$/', $pickupTime)) {
-      $errors['pickup-time'] = 'pickup time must be letters and space only  ';
+    if (!preg_match('/^[a-zA-Z0-9_\s]+$/', $_POST['meal-request'])) {
+      $errors['meal-request'] = "meal type is regular characters only ";
     }
   }
 
-  //  potentially use the else if for note field where parent can put special notes
-  if (empty($_POST['meal-request'])) {
-    $errors['meal-request'] = "required field";
+  if (empty($_POST['pickup-time'])) {
+    $errors['pickup-time'] =  'choose pickup time, ';
   } else {
-    $mealRequest = $_POST['meal-request'];
-    // [a-zA-Z\s]+)(,\s*[a-zA-Z\s]*)*$/'
-    if (!$mealRequest) {
-      $errors['meal-request'] = "regular characters only";
-    } else {
-      if ($_POST['meal-request'] == 'Vegerian') {
-        $mealVar = 'VT';
-      } else if ($_POST['meal-request'] == 'Vegan (lunch only)') {
-        $mealVar = 'VG';
-      } else if (($_POST['meal-request'] == 'Standard')) {
-        $mealVar = 'RG';
-      }
+    $pickupTime = $_POST['pickup-time'];
+    if (!preg_match('/^[a-zA-Z0-9_\s]+$/', $pickupTime)) {
+      $errors['pickup-time'] = 'pickup time must be letters and spaces only ';
+    }
+  }
+
+  if (empty($_POST['pickup-week'])) {
+    $errors['pickup-week'] =  'choose pickup week ';
+  } else {
+    $pickupWeek = $_POST['pickup-week'];
+    if (!preg_match('/^[a-zA-Z0-9,_\s]+$/', $pickupWeek)) {
+      $errors['pickup-week'] = 'pickup week must be letters and spaces only ';
     }
   }
 
   // check for errors
   if (array_filter($errors)) {
-    echo $errors['meal-request'];
+    echo $errors['meal-request'], $errors['pickup-time'], $errors['pickup-week'];
   } else {
+
+    // meal count
+    if($_POST['meal-request']){
+      $mealAmount = '_01';
+    } 
+    if($_POST['meal-request2']){
+      $mealAmount = '_02';
+    } 
+    if($_POST['meal-request3']){
+      $mealAmount = '_03';
+    } 
+    if($_POST['meal-request4']){
+      $mealAmount = '_04';
+    } 
+    if($_POST['meal-request5']){
+      $mealAmount = '_05';
+    } 
+
+    // if($)
+    
+
+
+    // fix standard meal string to empty 
+    if ($_POST['meal-request'] === "ST") {
+      $mr1 = '';
+    } else {
+      $mr1 = $_POST['meal-request'];
+    }
+
+    if ($_POST['meal-request2'] === "ST") {
+      $mr2 = '';
+    } else {
+      $mr2 = $_POST['meal-request2'];
+    }
+
+    if ($_POST['meal-request3'] === "ST") {
+      $mr3 = '';
+    } else {
+      $mr3 = $_POST['meal-request3'];
+    }
+
+    if ($_POST['meal-request4'] === "ST") {
+      $mr4 = '';
+    } else {
+      $mr4 = $_POST['meal-request4'];
+    }
+
+    if ($_POST['meal-request5'] === "ST") {
+      $mr5 = '';
+    } else {
+      $mr5 = $_POST['meal-request5'];
+    }
+
+    // if (isset($_POST['meal-request5'])) {
+
+      // // put meal-requests together like VG_VTGF_ST_
+      //       $mealRequest = $_POST['meal-request'] . $_POST['gluten-free'] ."_".$_POST['meal-request2']  . $_POST['gluten-free2'] ."_". $_POST['meal-request3'] . $_POST['gluten-free3']  ."_". $_POST['meal-request4'] . $_POST['gluten-free4']  ."_". $_POST['meal-request5'] . $_POST['gluten-free5']  ."_";
+      //   } elseif (isset($_POST['meal-request4'])) {
+
+      // // put meal-requests together like VG_VTGF_ST_
+      //       $mealRequest = $_POST['meal-request'] . $_POST['gluten-free'] ."_".$_POST['meal-request2']  . $_POST['gluten-free2'] ."_". $_POST['meal-request3'] . $_POST['gluten-free3']  ."_". $_POST['meal-request4'] . $_POST['gluten-free4']  ."_";
+      //   } elseif (isset($_POST['meal-request3'])) {
+
+      // // put meal-requests together like VG_VTGF_ST_
+      //       $mealRequest = $_POST['meal-request'] . $_POST['gluten-free'] ."_".$_POST['meal-request2']  . $_POST['gluten-free2'] ."_". $_POST['meal-request3'] . $_POST['gluten-free3']  ."_";
+      //   } elseif (isset($_POST['meal-request2'])) {
+
+      //   // put meal-requests together like VG_VTGF_ST_
+      //       $mealRequest = $_POST['meal-request'] . $_POST['gluten-free'] ."_".$_POST['meal-request2']  . $_POST['gluten-free2'] ."_";
+      //   } else {
+      //       $mealRequest = $_POST['meal-request'] . $_POST['gluten-free'] ."_";
+      //   }
+
+
+      // mealRequest string for code
+    if (isset($_POST['meal-request5'])) {
+
+      // put meal-requests together like VG_VTGF_ST_
+      $mealRequest = $mr1 . $_POST['gluten-free'] . $mr2  . $_POST['gluten-free2'] . $mr3 . $_POST['gluten-free3'] . $mr4 . $_POST['gluten-free4'] . $mr5 . $_POST['gluten-free5']  . "_";
+
+    } elseif (isset($_POST['meal-request4'])) {
+
+      // put meal-requests together like VG_VTGF_ST_
+      $mealRequest = $mr1 . $_POST['gluten-free'] . $mr2  . $_POST['gluten-free2'] . $mr3 . $_POST['gluten-free3'] . $mr4 . $_POST['gluten-free4']  . "_";
+
+    } elseif (isset($_POST['meal-request3'])) {
+
+      // put meal-requests together like VG_VTGF_ST_
+      $mealRequest = $mr1 . $_POST['gluten-free'] . $mr2  . $_POST['gluten-free2'] . $mr3 . $_POST['gluten-free3']  ."_";
+
+    } elseif (isset($_POST['meal-request2'])) {
+
+      // put meal-requests together like VG_VTGF_ST_
+      $mealRequest = $mr1 . $_POST['gluten-free'] . $mr2  . $_POST['gluten-free2'] ."_";
+
+    } 
+ 
+
+
+
+    // if stgf cap gf
 
     // db linkId == userId
     // save data to database
-    $mealRequest = mysqli_real_escape_string($conn, $_POST['meal-request']);
-    // $GF = mysqli_real_escape_string($conn, $_POST['gluten-free']);
     $mealType = mysqli_real_escape_string($conn, $_POST['desired-meals']);
     $pickupTime = mysqli_real_escape_string($conn, $_POST['pickup-time']);
     $pickupWeek = mysqli_real_escape_string($conn, $_POST['pickup-week']);
     $linkId = mysqli_real_escape_string($conn, $_POST['userId']);
-    if(isset($_POST['gluten-free'])){
+    if (isset($_POST['gluten-free'])) {
       $GF = 'yes';
     } else {
       $GF = 'no';
     }
 
-    // // // save data to database
-    // $mealRequest = $_POST['meal-request'];
-    // // $GF = $_POST['gluten-free'];
-    // $mealType = $_POST['desired-meals'];
-    // $pickupTime = $_POST['pickup-time'];
-    // $pickupWeek = $_POST['pickup-week'];
-    // $linkId = $_POST['userId'];
-
-
-
-
     // create sql
-    $sql = "INSERT INTO meals (mealVar,gf,mealType,pickupTime,pickupWeek,linkId) VALUES ('$mealRequest', '$GF', '$mealType', '$pickupTime', '$pickupWeek', '$linkId')";
-    // // save to db
-    // if (mysqli_query($conn, $sql)) {
+    $sql = "INSERT INTO meals (mealAmount,mealVar,gf,mealType,pickupTime,pickupWeek,linkId) VALUES ('$mealAmount', '$mealRequest', '$GF', '$mealType', '$pickupTime', '$pickupWeek', '$linkId')";
 
-    //   header('Location: index.php');
-    // } else {
-    //   echo 'query error: ' . mysqli_error($conn);
-    // }
-
-    // // create sql
     // $sql = "INSERT INTO meals (mealVar, linkId) VALUES ('$mealRequest', '$linkId')";
     // save to db
     if (mysqli_query($conn, $sql)) {
@@ -108,8 +185,8 @@ if (isset($_POST['submit'])) {
   }
 
 
-// close connection
-mysqli_close($conn);
+  // close connection
+  mysqli_close($conn);
 }
 
 ?>
@@ -132,13 +209,14 @@ mysqli_close($conn);
             <label for="">Your Request for</label>
             <h6><?php echo htmlspecialchars($meal['pickupWeek']); ?></h6>
             <ul>
-            <label for="">Pickup between</label>
+              <label for="">Pickup between</label>
 
               <?php foreach (explode(',', $meal['pickupTime']) as $details) : ?>
                 <li><?php echo htmlspecialchars($details) ?></li>
               <?php endforeach ?>
-              
-              <!-- <li><?php //echo htmlspecialchars($meal['mealAmount']) ?> </li> -->
+
+              <!-- <li><?php //echo htmlspecialchars($meal['mealAmount']) 
+                        ?> </li> -->
             </ul>
           </div>
           <div class="card-action right-align">
@@ -159,19 +237,14 @@ mysqli_close($conn);
 
 <!-- order form -->
 
-<section class="container grey-text">
+<section class="container grey-text ">
 
   <form action="request.php" class="" method="POST">
-  <input name="userId" value="1" type="hidden">
+    <input name="userId" value="1" type="hidden">
     <button class="allowed" id="allowed" style="display:none" value="<?php echo $allowedMeals ?>">
     </button>
 
     <div id="1" class="order1" style="display:none">
-
-      <!-- <label for="">Child's Name</label>
-      <input type="text" name="childName">
-      <div class="red-text"><?php //echo $errors['childName'] 
-                            ?></div> -->
 
       <label for="">Meal Request #1</label>
       <div class="input-field col s12">
@@ -196,7 +269,7 @@ mysqli_close($conn);
     <div id="2" class="order2" style="display:none">
       <label for="">Meal Request #2</label>
       <div class="input-field col s12">
-        <select name="meal-request">
+        <select name="meal-request2">
           <option value="" disabled selected>Select Meal Type...</option>
           <option value="ST">Standard</option>
           <option value="VT">Vegetarian</option>
@@ -205,7 +278,7 @@ mysqli_close($conn);
       </div>
       <div class="">
         <label>
-          <input type="checkbox" name="gluten-free" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="gf">
+          <input type="checkbox" name="gluten-free2" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="gf">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
@@ -215,35 +288,35 @@ mysqli_close($conn);
     <div id="3" class="order3" style="display:none">
       <label for="">Meal Request #3</label>
       <div class="input-field col s12">
-        <select name="meal-request">
+        <select name="meal-request3">
           <option value="" disabled selected>Select Meal Type...</option>
-          <option value="1">Standard</option>
-          <option value="2">Vegetarian</option>
-          <option value="3">Vegan (lunch only)</option>
+          <option value="ST">Standard</option>
+          <option value="VT">Vegetarian</option>
+          <option value="VG">Vegan (lunch only)</option>
         </select>
       </div>
       <div class="">
         <label>
-          <input type="checkbox" name="prefrence" class="with-gap" <?php //if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> value="Gluten Free">
+          <input type="checkbox" name="gluten-free3" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="gf">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
       <br>
     </div>
 
-    <!-- <div id="4" class="order4" style="display:none">
+    <div id="4" class="order4" style="display:none">
       <label for="">Meal Request #4</label>
       <div class="input-field col s12">
-        <select name="meal-request">
+        <select name="meal-request4">
           <option value="" disabled selected>Select Meal Type...</option>
-          <option value="1">Standard</option>
-          <option value="2">Vegetarian</option>
-          <option value="3">Vegan (lunch only)</option>
+          <option value="ST">Standard</option>
+          <option value="VT">Vegetarian</option>
+          <option value="VG">Vegan (lunch only)</option>
         </select>
       </div>
       <div class="">
         <label>
-          <input type="checkbox" name="prefrence" class="with-gap" <?php //if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> value="Gluten Free">
+          <input type="checkbox" name="gluten-free4" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="gf">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
@@ -253,21 +326,21 @@ mysqli_close($conn);
     <div id="5" class="order5" style="display:none">
       <label for="">Meal Request #5</label>
       <div class="input-field col s12">
-        <select name="meal-request">
+        <select name="meal-request5">
           <option value="" disabled selected>Select Meal Type...</option>
-          <option value="1">Standard</option>
-          <option value="2">Vegetarian</option>
-          <option value="3">Vegan (lunch only)</option>
+          <option value="ST">Standard</option>
+          <option value="VT">Vegetarian</option>
+          <option value="VG">Vegan (lunch only)</option>
         </select>
       </div>
       <div class="">
         <label>
-          <input type="checkbox" name="prefrence" class="with-gap" <?php //if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> value="Gluten Free">
+          <input type="checkbox" name="gluten-free5" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="gf">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
       <br>
-    </div> -->
+    </div>
 
     <!-- add meal button -->
     <div id="add-meal-btn" class="center">
@@ -310,7 +383,7 @@ mysqli_close($conn);
           </select>
         </p>
       </div><?php echo $errors['pickup-time'] ?>
-          
+
       <br>
 
       <!-- Week of -->
@@ -374,6 +447,7 @@ mysqli_close($conn);
 
 
     $("#add").on('click', function(e) {
+      $('form').addClass('z-depth-2')
       if (order < allowedMeals) {
         $(`.order${order}`).css({
           display: "block"

@@ -12,6 +12,7 @@ if (isset($_POST["submit"])) {
   // require_once '/config/db_connect.php';
   require_once 'functions.inc.php';
 
+  // take to main page DONE
   if (emptyInputRegister($name, $email, $pwd, $pwdRepeat) !== false) {
     header(("location: ../register.php?error=emptyinput"));
     exit();

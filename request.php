@@ -72,39 +72,36 @@ if (isset($_POST['submit'])) {
       $mealAmount = '_05';
     } 
 
-    // if($)
-    
-
 
     // fix standard meal string to empty 
     if ($_POST['meal-request'] === "ST") {
       $mr1 = '';
     } else {
-      $mr1 = $_POST['meal-request'];
+      $mr1 = mysqli_real_escape_string($conn, $_POST['meal-request']);
     }
 
     if ($_POST['meal-request2'] === "ST") {
       $mr2 = '';
     } else {
-      $mr2 = $_POST['meal-request2'];
+      $mr2 = mysqli_real_escape_string($conn, $_POST['meal-request2']);
     }
 
     if ($_POST['meal-request3'] === "ST") {
       $mr3 = '';
     } else {
-      $mr3 = $_POST['meal-request3'];
+      $mr3 = mysqli_real_escape_string($conn, $_POST['meal-request3']);
     }
 
     if ($_POST['meal-request4'] === "ST") {
       $mr4 = '';
     } else {
-      $mr4 = $_POST['meal-request4'];
+      $mr4 = mysqli_real_escape_string($conn, $_POST['meal-request4']);
     }
 
     if ($_POST['meal-request5'] === "ST") {
       $mr5 = '';
     } else {
-      $mr5 = $_POST['meal-request5'];
+      $mr5 = mysqli_real_escape_string($conn, $_POST['meal-request5']);
     }
 
     // if (isset($_POST['meal-request5'])) {
@@ -128,6 +125,8 @@ if (isset($_POST['submit'])) {
       //   }
 
 
+
+
       // mealRequest string for code
     if (isset($_POST['meal-request5'])) {
 
@@ -149,10 +148,12 @@ if (isset($_POST['submit'])) {
       // put meal-requests together like VG_VTGF_ST_
       $mealRequest = $mr1 . $_POST['gluten-free'] . $mr2  . $_POST['gluten-free2'] ."_";
 
-    } 
+    } elseif (isset($_POST['meal-request'])) {
+      $mealRequest = $mr1 . $_POST['gluten-free'];
+    }
  
 
-
+    
 
     // if stgf cap gf
 
@@ -176,7 +177,6 @@ if (isset($_POST['submit'])) {
     if (mysqli_query($conn, $sql)) {
       // this looks for last id made in meals table
       $orderId = $conn->insert_id;
-
       header('Location: thankyou.php?id=' . $orderId);
       // header('Location: thankyou.php');
     } else {
@@ -240,7 +240,7 @@ if (isset($_POST['submit'])) {
 <section class="container grey-text ">
 
   <form action="request.php" class="" method="POST">
-    <input name="userId" value="1" type="hidden">
+    <input name="userId" value="2" type="hidden">
     <button class="allowed" id="allowed" style="display:none" value="<?php echo $allowedMeals ?>">
     </button>
 
@@ -251,15 +251,15 @@ if (isset($_POST['submit'])) {
         <select name="meal-request">
           <option value="" disabled selected>Select Meal Type...</option>
           <option value="ST">Standard</option>
-          <option value="VT">Vegetarian</option>
-          <option value="VG">Vegan (lunch only)</option>
+          <option value="Vt">Vegetarian</option>
+          <option value="Vg">Vegan (lunch only)</option>
         </select>
         <div class="red-text"><?php echo $errors['meal-request'] ?>
         </div>
       </div>
       <div class="">
         <label>
-          <input type="checkbox" name="gluten-free" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="gf">
+          <input type="checkbox" name="gluten-free" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="Gf">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
@@ -272,13 +272,13 @@ if (isset($_POST['submit'])) {
         <select name="meal-request2">
           <option value="" disabled selected>Select Meal Type...</option>
           <option value="ST">Standard</option>
-          <option value="VT">Vegetarian</option>
-          <option value="VG">Vegan (lunch only)</option>
+          <option value="Vt">Vegetarian</option>
+          <option value="Vg">Vegan (lunch only)</option>
         </select>
       </div>
       <div class="">
         <label>
-          <input type="checkbox" name="gluten-free2" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="gf">
+          <input type="checkbox" name="gluten-free2" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="Gf">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
@@ -291,13 +291,13 @@ if (isset($_POST['submit'])) {
         <select name="meal-request3">
           <option value="" disabled selected>Select Meal Type...</option>
           <option value="ST">Standard</option>
-          <option value="VT">Vegetarian</option>
-          <option value="VG">Vegan (lunch only)</option>
+          <option value="Vt">Vegetarian</option>
+          <option value="Vg">Vegan (lunch only)</option>
         </select>
       </div>
       <div class="">
         <label>
-          <input type="checkbox" name="gluten-free3" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="gf">
+          <input type="checkbox" name="gluten-free3" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="Gf">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
@@ -310,13 +310,13 @@ if (isset($_POST['submit'])) {
         <select name="meal-request4">
           <option value="" disabled selected>Select Meal Type...</option>
           <option value="ST">Standard</option>
-          <option value="VT">Vegetarian</option>
-          <option value="VG">Vegan (lunch only)</option>
+          <option value="Vt">Vegetarian</option>
+          <option value="Vg">Vegan (lunch only)</option>
         </select>
       </div>
       <div class="">
         <label>
-          <input type="checkbox" name="gluten-free4" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="gf">
+          <input type="checkbox" name="gluten-free4" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="Gf">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
@@ -329,13 +329,13 @@ if (isset($_POST['submit'])) {
         <select name="meal-request5">
           <option value="" disabled selected>Select Meal Type...</option>
           <option value="ST">Standard</option>
-          <option value="VT">Vegetarian</option>
-          <option value="VG">Vegan (lunch only)</option>
+          <option value="Vt">Vegetarian</option>
+          <option value="Vg">Vegan (lunch only)</option>
         </select>
       </div>
       <div class="">
         <label>
-          <input type="checkbox" name="gluten-free5" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="gf">
+          <input type="checkbox" name="gluten-free5" class="with-gap <?php if (isset($prefrence) && $prefrence == "Gluten Free") echo "checked"; ?> " value="Gf">
           <span>Gluten Free (lunch only)</span>
         </label>
       </div>
@@ -361,7 +361,7 @@ if (isset($_POST['submit'])) {
       <!-- Meals desired  -->
       <div type="text" class="input-field grey-text col s12">
         <p>
-          Select which meals are desired? <br>(Vegan and Gluten Free options will be lunch only)
+          Select which meals are desired? <br>(All Vegan and Gluten Free options will be lunch only)
           <select name="desired-meals">
             <option value="BL"><label>Breakfast and Lunch</label> </option>
             <option value="BO">Breakfast only</option>

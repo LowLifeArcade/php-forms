@@ -1,8 +1,8 @@
 <?php 
 
-function emptyInputRegister($numberOfStudents, $studentNames, $fullName, $email, $userPwd, $pwdRepeat){
+function emptyInputRegister($name, $email, $pwd, $pwdRepeat){
   $result = 'true';
-  if (empty($studentNames) || empty($numberOfStudents) || empty($fullName) || empty($email) || empty($userPwd)|| empty($pwdRepeat)) {
+  if (empty($name) || empty($email) || empty($pwd)|| empty($pwdRepeat)) {
     $result = true;
   } else {
     $result = false;
@@ -11,10 +11,9 @@ function emptyInputRegister($numberOfStudents, $studentNames, $fullName, $email,
 }
 
 
-function invalidUid($userName){
+function invalidUid($name){
   $result = 'true';
-  // confused think this one over
-  if (!preg_match("/^[a-zA-Z0-9\s]*$/", $userName)) {
+  if (!preg_match("/^[a-zA-Z0-9]*$/", $name)) {
     $result = true;
   } else {
     $result = false;
@@ -32,9 +31,9 @@ function invalidEmail($email){
   return $result;
 }
 
-function pwdMatch($userPwd, $pwdRepeat) {
+function pwdMatch($pwd, $pwdRepeat) {
   $result = 'true';
-  if ($userPwd !== $pwdRepeat) {
+  if ($pwd !== $pwdRepeat) {
     $result = true;
   } else {
     $result = false;
@@ -42,15 +41,15 @@ function pwdMatch($userPwd, $pwdRepeat) {
   return $result;
 }
 
-function emailExists($conn, $email) {
-  $sql = "SELECT * FROM users WHERE userEmail = ?;";
+function emailExists($conn, $email, $name) {
+  $sql = "SELECT * FROM meals WHERE userEmail = ? OR userName = ?;";
   $stmt = mysqli_stmt_init($conn);
   if (!mysqli_stmt_prepare($stmt, $sql)) {
-    header("location: register.php?error=emailinuse");
+    header("location: ../register.php?error=stmtfailed");
     exit();
   }
 
-  mysqli_stmt_bind_param($stmt, "s", $email );
+  mysqli_stmt_bind_param($stmt, "ss", $name, $email );
   mysqli_stmt_execute($stmt);
 
   $resultData = mysqli_stmt_get_result($stmt);
@@ -65,20 +64,17 @@ function emailExists($conn, $email) {
   mysqli_stmt_close($stmt);
 }
 
-// not used
-function createUser($conn, $fullName, $email, $userPwd) {
-
+function createUser($conn, $name, $email, $pwd) {
   $sql = "INSERT INTO meals (userName, userEmail, userPwd) VALUES (?, ?, ?);";
-
   $stmt = mysqli_stmt_init($conn);
   if (!mysqli_stmt_prepare($stmt, $sql)) {
     header("location: ../register.php?error=stmtfailed2");
     exit();
   }
 
-  $hashedPwd = password_hash($userPwd, PASSWORD_DEFAULT);
+  $hashedPwd = password_hash($pwd, PASSWORD_DEFAULT);
 
-  mysqli_stmt_bind_param($stmt, "sss", $fullName, $email, $hashedPwd);
+  mysqli_stmt_bind_param($stmt, "sss", $name, $email, $hashedPwd);
   mysqli_stmt_execute($stmt);
   mysqli_stmt_close($stmt);
 

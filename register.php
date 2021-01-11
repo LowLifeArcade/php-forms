@@ -1,6 +1,132 @@
 <?php
+include('config/db_connect.php');
+require_once 'includes/functions.inc.php';
 
-// filter submitsion for errors 
+
+// filter submision for errors 
+
+$numberOfStudents = $studentNames = $fullName = $email = $userPwd = $userCode;
+$errors = array('numberOfStudents' => '', 'student-name1' => '', 'student-name2' => '', 'student-name3' => '', 'student-name4' => '', 'student-name5' => '', 'full-name' => '', 'email' => '', 'pwd' => '');
+
+if (isset($_POST['submit'])) {
+  $numberOfStudents = $_POST['numberOfStudents'];
+  $studentNames = $_POST['student-name1'];
+  $fullName = $_POST['full-name'];
+  $email = $_POST['email'];
+  $userPwd = $_POST['pwd'];
+  $pwdRepeat = $_POST['pwdRepeat'];
+
+  if (emptyInputRegister($numberOfStudents, $studentNames, $fullName, $email, $userPwd, $pwdRepeat) !== false) {
+    header(("location: register.php?error=emptyinput"));
+    exit();
+  }
+
+  if (invalidEmail($email) !== false) {
+    header(("location: register.php?error=invalidemail"));
+    exit();
+  }
+
+  if (pwdMatch($userPwd, $pwdRepeat) !== false) {
+    header(("location: register.php?error=passwordsdontmatch"));
+    exit();
+  }
+
+  if (emailExists($conn, $email) !== false) {
+    header(("location: register.php?error=usernametaken"));
+    exit();
+  }
+
+  
+  
+  // do query to get dates of meal requests to compare against the post request and to deny them a repeat order for that week
+
+  // empty filters and reg ex string fitlers
+
+  // email check
+
+  // password param check (min req 8 char, 1 special, 1 cap) then hash password
+
+  // error check
+  if (array_filter($errors)) {
+    echo $errors;
+  } else {
+
+    // take userName and student names and extract a userCode with algorthim 
+
+
+    $mr1 = mysqli_real_escape_string($conn, $_POST['student-name1']);
+    $mr2 = mysqli_real_escape_string($conn, $_POST['student-name2']);
+    $mr3 = mysqli_real_escape_string($conn, $_POST['student-name3']);
+    $mr4 = mysqli_real_escape_string($conn, $_POST['student-name4']);
+    $mr5 = mysqli_real_escape_string($conn, $_POST['student-name5']);
+
+    // student name string 
+    if (isset($_POST['student-name5'])) {
+
+      $studentNames = $mr1 . ',' . $mr2  . ',' . $mr3 . ',' . $mr4 . ',' . $mr5;
+    } elseif (isset($_POST['student-name4'])) {
+
+      $studentNames = $mr1 . ',' . $mr2  . ',' . $mr3 . ',' . $mr4;
+    } elseif (isset($_POST['student-name3'])) {
+      
+      $studentNames = $mr1 .  ',' . $mr2 .  ','  . $mr3;
+    } elseif (isset($_POST['student-name2'])) {
+      $studentNames = $mr1 . ',' . $mr2;
+
+    } elseif (isset($_POST['student-name1'])) {
+      $studentNames = $mr1;
+    }
+
+    // dummy data
+    $userCode = 'xlr';
+
+    // save data with escape strings
+    $numberOfStudents = mysqli_real_escape_string($conn, $_POST['numberOfStudents']);
+    $fullName = mysqli_real_escape_string($conn, $_POST['full-name']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $userPwd = mysqli_real_escape_string($conn, $_POST['pwd']);
+    // $userCode = mysqli_real_escape_string($conn, $userCode);
+
+    // $sql = "INSERT INTO users (numberOfStudents,userName,userEmail,userPwd,studentNames,userCode) VALUES ('$numberOfStudents', '$fullName', '$email', '$userPwd', '$studentNames', '$userCode')";
+    $sql = "INSERT INTO users (numberOfStudents,studentNames,userName,userEmail,userPwd,userCode) VALUES (?, ?, ?, ?, ?, ?);";
+
+    $stmt = mysqli_stmt_init($conn);
+    if(!mysqli_stmt_prepare($stmt, $sql)) {
+      header('location: register.php?error=stmtfailed');
+      exit();
+    }
+
+    $hashedPwd = password_hash($userPwd, PASSWORD_DEFAULT);
+
+    mysqli_stmt_bind_param($stmt, "ssssss", $numberOfStudents, $studentNames, $fullName, $email, $hashedPwd, $userCode);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+
+
+    // //  save for later bellow
+    //  // save to db
+    //  if (mysqli_query($conn, $sql)) {
+    //   // this looks for last id made in meals table
+    //   $orderId = $conn->insert_id;
+    //   header('Location: request.php?id=' . $orderId);
+    //   // header('Location: thankyou.php');
+    // } else {
+    //   echo 'query error: ' . mysqli_error($conn);
+    // }
+
+
+    // need to change this so id isn't a get
+    $orderId = $conn->insert_id;
+      // send to header with post so it changes the hidden field of user? Can i do that?
+      header('Location: request.php?id=' . $orderId);
+  }
+
+  // close connection
+  mysqli_close($conn);
+  // header('Location: index.php');
+}
+
+
 // required email and password
 
 ?>
@@ -8,10 +134,13 @@
 <?php include('templates/extheader.php'); ?>
 
 <br>
+
 <body class="grey lighten-4">
   <section class="register-form container grey-text border-radius-1">
     <h4 class="center">Meal Registration</h4>
-    <form action="includes/register.inc.php" class="white" method="POST">
+    <form action="register.php" class="white" method="POST">
+    <!-- <form action="includes/register.inc.php" class="white" method="POST"> -->
+
 
       <label class="select" for="">Number of Children Being Registered For Weekly Meal Service<br>(18 and under only)</label>
       <div class="input-field col s12 select">
@@ -24,7 +153,7 @@
           <option value="5">5</option>
         </select>
       </div>
-      <div class="outputArea" ></div>
+      <div class="outputArea"></div>
 
       <!-- <div class="input-group">
         <label for="">Students Name and school they attend. If not in school specify age</label>
@@ -74,8 +203,10 @@
         var htmlString = "";
         var len = $("select").val();
         console.log(len)
+        $num = 1
         for (var i = 0; i < len; i++) {
-          htmlString += "<div class='input-group'><label for=''>Students Name and school they attend. If not in school specify age.</label><input type='text' name='student-name'>"
+          htmlString += `<div class='input-group'><label for=''>Students Name and school they attend. If not in school specify age.</label><input type='text' name='student-name${$num}'>`
+          $num++
         }
         $(document.querySelector('.outputArea')).append(htmlString);
         // hide select box somehow after chossing 
@@ -84,7 +215,7 @@
           display: "none"
         });
       });
-      
+
 
       // let order = 1
       // let allowedMeals = parseInt(document.getElementById("allowed").value) + 1

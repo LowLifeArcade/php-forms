@@ -18,6 +18,7 @@ if (isset($_POST['submit'])) {
 
   // empty inputs check and reg ex
   if (emptyInputRegister($numberOfStudents, $studentNames, $fullName, $email, $userPwd, $pwdRepeat) !== false) {
+    $errors['student-name1'] = 'missing fields';
     header(("location: register.php?error=emptyinput"));
     exit();
   }
@@ -29,6 +30,8 @@ if (isset($_POST['submit'])) {
 
   if (pwdMatch($userPwd, $pwdRepeat) !== false) {
     header(("location: register.php?error=passwordsdontmatch"));
+    $errors['pwd'] = 'passwords don not mach';
+
     exit();
   }
 
@@ -38,25 +41,12 @@ if (isset($_POST['submit'])) {
     exit();
   }
 
-  // if (empty($_POST['student-name1'])) {
-  //   $errors['childname'] =  'student name is required <br />';
-  // } else {
-  //   $studentNames = $_POST['student-name1'];
-  //   if (!preg_match('/^[a-zA-Z\s]+$/', $childname)) {
-  //     $errors['student-name1'] = 'name must be letters and space only  ';
-  //   }
-  // }
-
-
 
   // do query to get dates of meal requests to compare against the post request and to deny them a repeat order for that week
 
-  // empty filters and reg ex string fitlers
-
-
   // error check
   if (array_filter($errors)) {
-    echo $errors;
+    echo 'error';
   } else {
 
     // take userName and student names and extract a userCode with algorthim 
@@ -145,7 +135,7 @@ if (isset($_POST['submit'])) {
     <h4 class="center">Meal Registration</h4>
     <form action="register.php" class="white" method="POST">
       <!-- <form action="includes/register.inc.php" class="white" method="POST"> -->
-
+      <?php echo $errors['student-name1'] ?>
 
       <label class="select" for="">Number of Children Being Registered For Weekly Meal Service<br>(18 and under only)</label>
       <div class="input-field col s12 select">
@@ -183,6 +173,7 @@ if (isset($_POST['submit'])) {
         <label for="">Confirm Password</label>
         <input type="password" name="pwdRepeat">
       </div>
+      <?php echo $errors['pwd'] ?>
       <br>
       <div class="input-group">
         <button type="submit" name="submit" class="btn z-depth-0">Register</button>

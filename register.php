@@ -16,6 +16,7 @@ if (isset($_POST['submit'])) {
   $userPwd = $_POST['pwd'];
   $pwdRepeat = $_POST['pwdRepeat'];
 
+  // empty inputs check and reg ex
   if (emptyInputRegister($numberOfStudents, $studentNames, $fullName, $email, $userPwd, $pwdRepeat) !== false) {
     header(("location: register.php?error=emptyinput"));
     exit();
@@ -31,20 +32,27 @@ if (isset($_POST['submit'])) {
     exit();
   }
 
+  // password param check (min req 8 char, 1 special, 1 cap) then hash password
   if (emailExists($conn, $email) !== false) {
     header(("location: register.php?error=usernametaken"));
     exit();
   }
 
-  
-  
+  // if (empty($_POST['student-name1'])) {
+  //   $errors['childname'] =  'student name is required <br />';
+  // } else {
+  //   $studentNames = $_POST['student-name1'];
+  //   if (!preg_match('/^[a-zA-Z\s]+$/', $childname)) {
+  //     $errors['student-name1'] = 'name must be letters and space only  ';
+  //   }
+  // }
+
+
+
   // do query to get dates of meal requests to compare against the post request and to deny them a repeat order for that week
 
   // empty filters and reg ex string fitlers
 
-  // email check
-
-  // password param check (min req 8 char, 1 special, 1 cap) then hash password
 
   // error check
   if (array_filter($errors)) {
@@ -52,8 +60,6 @@ if (isset($_POST['submit'])) {
   } else {
 
     // take userName and student names and extract a userCode with algorthim 
-
-
     $mr1 = mysqli_real_escape_string($conn, $_POST['student-name1']);
     $mr2 = mysqli_real_escape_string($conn, $_POST['student-name2']);
     $mr3 = mysqli_real_escape_string($conn, $_POST['student-name3']);
@@ -68,11 +74,10 @@ if (isset($_POST['submit'])) {
 
       $studentNames = $mr1 . ',' . $mr2  . ',' . $mr3 . ',' . $mr4;
     } elseif (isset($_POST['student-name3'])) {
-      
+
       $studentNames = $mr1 .  ',' . $mr2 .  ','  . $mr3;
     } elseif (isset($_POST['student-name2'])) {
       $studentNames = $mr1 . ',' . $mr2;
-
     } elseif (isset($_POST['student-name1'])) {
       $studentNames = $mr1;
     }
@@ -87,11 +92,10 @@ if (isset($_POST['submit'])) {
     $userPwd = mysqli_real_escape_string($conn, $_POST['pwd']);
     // $userCode = mysqli_real_escape_string($conn, $userCode);
 
-    // $sql = "INSERT INTO users (numberOfStudents,userName,userEmail,userPwd,studentNames,userCode) VALUES ('$numberOfStudents', '$fullName', '$email', '$userPwd', '$studentNames', '$userCode')";
     $sql = "INSERT INTO users (numberOfStudents,studentNames,userName,userEmail,userPwd,userCode) VALUES (?, ?, ?, ?, ?, ?);";
 
     $stmt = mysqli_stmt_init($conn);
-    if(!mysqli_stmt_prepare($stmt, $sql)) {
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
       header('location: register.php?error=stmtfailed');
       exit();
     }
@@ -117,17 +121,18 @@ if (isset($_POST['submit'])) {
 
     // need to change this so id isn't a get
     $orderId = $conn->insert_id;
-      // send to header with post so it changes the hidden field of user? Can i do that?
-      header('Location: request.php?id=' . $orderId);
+    // send to header with post so it changes the hidden field of user? Can i do that?
+
+    // close connection
+
+    mysqli_close($conn);
+    header('Location: request.php?id=' . $orderId);
   }
 
-  // close connection
-  mysqli_close($conn);
   // header('Location: index.php');
 }
 
 
-// required email and password
 
 ?>
 
@@ -139,7 +144,7 @@ if (isset($_POST['submit'])) {
   <section class="register-form container grey-text border-radius-1">
     <h4 class="center">Meal Registration</h4>
     <form action="register.php" class="white" method="POST">
-    <!-- <form action="includes/register.inc.php" class="white" method="POST"> -->
+      <!-- <form action="includes/register.inc.php" class="white" method="POST"> -->
 
 
       <label class="select" for="">Number of Children Being Registered For Weekly Meal Service<br>(18 and under only)</label>

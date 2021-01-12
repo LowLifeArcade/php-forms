@@ -5,6 +5,9 @@ function emptyInputRegister($numberOfStudents, $studentNames, $fullName, $email,
   if (empty($studentNames) || empty($numberOfStudents) || empty($fullName) || empty($email) || empty($userPwd)|| empty($pwdRepeat)) {
     $result = true;
   } else {
+    if (!preg_match('/^[a-zA-Z\s]+$/', $numberOfStudents) ||!preg_match('/^[a-zA-Z\s]+$/', $studentNames) ||!preg_match('/^[a-zA-Z\s]+$/', $fullName) ||!preg_match('/^[a-zA-Z\s]+$/', $email) ||!preg_match('/^[a-zA-Z\s]+$/', $userPwd) ||!preg_match('/^[a-zA-Z\s]+$/', $pwdRepeat)) {
+      $errors['student-name1'] = 'must be letters and space only  ';
+    }
     $result = false;
   }
   return $result;

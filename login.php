@@ -1,7 +1,17 @@
 <?php
+include('config/db_connect.php');
 
 // filter submitsion for errors 
-// required email and password
+
+if($_POST['submit']) {
+
+  // required email and password
+  
+  $sql = 'SELECT userId, userEmail FROM users;';
+  
+  $stmt = mysqli_stmt_init($conn);
+}
+
 
 ?>
 
